@@ -1,0 +1,204 @@
+---
+title: "Navajas"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    df_print: paged
+    toc: TRUE
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = '~/Datos/varios/geobotanica/')
+```
+
+```{r librerias, include=FALSE}
+library(rgbif)
+library(DT)
+library(htmltools)
+library(rgdal)
+library(ggplot2)
+library(dplyr)
+```
+
+
+```{r echo=FALSE, cache=TRUE, warning=FALSE, include=FALSE}
+plantae_df <- read.csv("./data/interim/plantae_occ.csv")
+plantae_df <- plantae_df[plantae_df$species != "",]
+
+plantae_df <- dplyr::select(plantae_df, phylum, class, order, family, genus, species,
+                            scientificName, acceptedScientificName,verbatimScientificName,
+                            taxonRank)
+
+plantae_df <- plantae_df[order(plantae_df$phylum,
+                               plantae_df$class,
+                               plantae_df$order,
+                               plantae_df$family,
+                               plantae_df$genus,
+                               plantae_df$species),]
+
+tracheo_df <- plantae_df[plantae_df$phylum == "Tracheophyta",]
+```
+
+
+```{r echo=FALSE, cache=TRUE, warning=FALSE, include=FALSE}
+tracheo_e <- group_by(tracheo_df, phylum, class, order, family, genus, species, acceptedScientificName,
+                      verbatimScientificName, taxonRank)
+tracheo_e <- count(tracheo_e)
+
+tracheo_g <- group_by(tracheo_e, phylum, class, order, family, genus)
+tracheo_g <- count(tracheo_g)
+
+tracheo_f <- group_by(tracheo_g, phylum, class, order, family)
+
+tracheo_f <- count(tracheo_f,)
+
+```
+
+# Plantae
+
+## Tracheophyta
+  
+```{r echo=FALSE}
+datatable(tracheo_e, 
+          extensions = 'Buttons',
+          options = list(dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel')), 
+          filter =  "top")
+
+```
+
+### Taxa in each genus
+```{r echo=FALSE}
+datatable(tracheo_g, 
+          extensions = 'Buttons',
+          options = list(dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel')), 
+          filter =  "top")
+
+```
+
+### Genus in each family
+
+```{r echo=FALSE}
+datatable(tracheo_f, 
+          extensions = 'Buttons',
+          options = list(dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel')), 
+          filter =  "top")
+
+```
+ 
+## Bryophyta
+
+```{r echo=FALSE}
+datatable(plantae_df[plantae_df$phylum == "Bryophyta",], 
+          extensions = 'Buttons',
+          options = list(dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel')), 
+          filter =  "top")
+
+```
+
+\newpage
+
+## Marchantiophyta
+
+```{r echo=FALSE}
+datatable(plantae_df[plantae_df$phylum == "Marchantiophyta",], 
+          extensions = 'Buttons',
+          options = list(dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel')), 
+          filter =  "top")
+
+```
+
+# Árboles
+
+## Ordenes de Tracheophyta
+
+```{r echo=FALSE, cache = TRUE, warning=FALSE}
+names <- unique(plantae_df$order[plantae_df$phylum == "Tracheophyta"])
+tnrs_names <-rotl::tnrs_match_names(names)
+rotl_tree <- rotl::tol_induced_subtree(tnrs_names$ott_id, label_format = "name")
+
+ape::plot.phylo(rotl_tree, no.margin = TRUE, cex = 0.6)
+
+```
+
+## Familias Liliopsida
+
+```{r echo =FALSE, cache=TRUE, warning=FALSE}
+names <- unique(plantae_df$family[plantae_df$class == "Liliopsida"])
+tnrs_names <-rotl::tnrs_match_names(names)
+rotl_tree <- rotl::tol_induced_subtree(tnrs_names$ott_id, label_format = "name")
+
+ape::plot.phylo(rotl_tree, no.margin = TRUE, cex = 0.6)
+```
+
+## Géneros Poaceae
+
+```{r echo =FALSE, cache=TRUE, warning=FALSE}
+names <- unique(plantae_df$genus[plantae_df$family == "Poaceae"])
+names <- names[names != "Imperata"]
+names <- names[names != "Stipellula"]
+
+tnrs_names <-rotl::tnrs_match_names(names)
+tnrs_names <- tnrs_names[tnrs_names$ott_id != "4730941", ]
+tnrs_names <- tnrs_names[tnrs_names$ott_id != "7587877", ]
+tnrs_names <- tnrs_names[tnrs_names$ott_id != "4730945", ]
+
+rotl_tree <- rotl::tol_induced_subtree(tnrs_names$ott_id, label_format = "name")
+
+ape::plot.phylo(rotl_tree, no.margin = TRUE, cex = 0.6)
+```
+
+## Especies Malvales
+
+```{r echo =FALSE, cache=TRUE, warning=FALSE}
+names <- unique(plantae_df$species[plantae_df$order == "Malvales"])
+tnrs_names <-rotl::tnrs_match_names(names)
+
+rotl_tree <- rotl::tol_induced_subtree(tnrs_names$ott_id, label_format = "name")
+
+ape::plot.phylo(rotl_tree, no.margin = TRUE, cex = 0.6)
+```
+
+## Géneros Lamiales 
+
+```{r echo =FALSE, cache=TRUE, warning=FALSE}
+names <- unique(plantae_df$genus[plantae_df$order == "Lamiales"])
+names <- names[names != "Chrysojasminum"]
+tnrs_names <-rotl::tnrs_match_names(names)
+rotl_tree <- rotl::tol_induced_subtree(tnrs_names$ott_id, label_format = "name")
+
+ape::plot.phylo(rotl_tree, no.margin = TRUE, cex = 0.6)
+```
+
+## Géneros Asteraceae
+
+```{r echo =FALSE, cache=TRUE, warning=FALSE}
+names <- unique(plantae_df$genus[plantae_df$family == "Asteraceae"])
+names <- names[names != "Bellis"]
+tnrs_names <-rotl::tnrs_match_names(names)
+tnrs_names <- tnrs_names[tnrs_names$ott_id != "4727438", ]
+
+rotl_tree <- rotl::tol_induced_subtree(tnrs_names$ott_id, label_format = "name")
+
+ape::plot.phylo(rotl_tree, no.margin = TRUE, cex = 0.6)
+```
+
+## Géneros Fabaceae
+
+```{r echo =FALSE, cache=TRUE, warning=FALSE}
+names <- unique(plantae_df$genus[plantae_df$family == "Fabaceae"])
+tnrs_names <-rotl::tnrs_match_names(names)
+tnrs_names <- tnrs_names[tnrs_names$ott_id != "366947", ]
+
+rotl_tree <- rotl::tol_induced_subtree(tnrs_names$ott_id, label_format = "name")
+
+
+
+
+ape::plot.phylo(rotl_tree, no.margin = TRUE, cex = 0.6)
+```

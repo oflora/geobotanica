@@ -1,0 +1,40 @@
+#+TITLE: Readme
+
+* Descripción
+
+Repositorio dedicado al estudio de la Geobotánica. Contiene
+
+* Contenidos repositorio
+** Estructura de directorios
+
+#+begin_src bash :exports results
+tree -d -n
+#+end_src
+
+#+RESULTS:
+| .   |             |           |
+| ├── | data        |           |
+| │   | ├──         | external  |
+| │   | ├──         | interim   |
+| │   | ├──         | processed |
+| │   | └──         | raw       |
+| ├── | docs        |           |
+| │   | ├──         | docs      |
+| │   | ├──         | img       |
+| │   | └──         | notas     |
+| ├── | notebooks   |           |
+| │   | ├──         | explore   |
+| │   | └──         | reports   |
+| ├── | results     |           |
+| │   | ├──         | data      |
+| │   | ├──         | docs      |
+| │   | ├──         | figures   |
+| │   | └──         | models    |
+| └── | src         |           |
+| ├── | python      |           |
+| ├── | R           |           |
+| └── | SQL         |           |
+|     |             |           |
+| 21  | directories |           |
+
+** Subproyectos

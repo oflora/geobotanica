@@ -1,0 +1,69 @@
+---
+title: "Selección flora para listado semillas"
+output: html_notebook
+---
+# Filogenias
+
+```{r}
+library(rotl)
+library(dplyr)
+```
+
+```{r}
+veg_data <- read.csv("./data/external/Plantae_gbif_occ_DWCA.csv")
+veg_data <- group_by(veg_data, phylum, class, order, family, genus,
+                     species, specificEpithet, infraspecificEpithet,
+                     scientificName, acceptedScientificName, taxonomicStatus, 
+                     taxonRank)
+
+veg_data <- count(veg_data)
+
+
+veg_data <- veg_data[order(veg_data$phylum, veg_data$class, veg_data$order,
+                           veg_data$family, veg_data$genus, veg_data$species),]
+veg_data <- veg_data[veg_data$specificEpithet != "",]
+```
+
+
+Extracción de arboles filógeneticos para selección de plantas
+
+```{r}
+subset <- veg_data[veg_data$class == "Magnoliopsida",]
+veg_rotl_names <- rotl::tnrs_match_names(unique(subset$order))
+veg_rotl_names <- na.omit(veg_rotl_names$ott_id)
+
+veg_rotl_names <- veg_rotl_names[veg_rotl_names != 4736774]
+veg_rotl_names <- veg_rotl_names[veg_rotl_names != 47951]
+
+veg_tree <- rotl::tol_induced_subtree(veg_rotl_names, label_format = "name")
+
+ape::plot.phylo(veg_tree)
+```
+
+
+```{r}
+subset <- veg_data[veg_data$order == "Lamiales",]
+veg_rotl_names <- rotl::tnrs_match_names(unique(subset$family))
+veg_rotl_names <- na.omit(veg_rotl_names$ott_id)
+
+veg_rotl_names <- veg_rotl_names[veg_rotl_names != 7630426]
+
+
+veg_tree <- rotl::tol_induced_subtree(veg_rotl_names, label_format = "name")
+
+ape::plot.phylo(veg_tree)
+```
+
+```{r}
+subset <- veg_data[veg_data$family == "Lamiaceae",]
+veg_rotl_names <- rotl::tnrs_match_names(unique(subset$genus))
+veg_rotl_names <- na.omit(veg_rotl_names$ott_id)
+
+veg_rotl_names <- veg_rotl_names[veg_rotl_names != 7630426]
+
+
+veg_tree <- rotl::tol_induced_subtree(veg_rotl_names, label_format = "name")
+
+ape::plot.phylo(veg_tree)
+```
+
